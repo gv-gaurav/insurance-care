@@ -1,31 +1,130 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Mobile Navigation Menu Toggle (toggles class for responsive layout)
-    const mobileToggle = document.querySelector(".mobile-nav-toggle");
-    const navLinks = document.querySelector(".nav-links");
+    // 1. Premium Mobile Side Screen Navigation Drawer
+    const initMobileDrawer = () => {
+        // Detect relative path prefix from existing logo or CSS link
+        const logoLink = document.querySelector(".logo-branded, .logo-new, .logo")?.getAttribute("href") || "./";
+        const rootPrefix = (logoLink === "./" || logoLink === "/") ? "" : logoLink;
+        const homeHref = logoLink;
 
-    if (mobileToggle && navLinks) {
-        mobileToggle.addEventListener("click", () => {
-            navLinks.classList.toggle("show");
-            const isExpanded = navLinks.classList.contains("show");
-            mobileToggle.setAttribute("aria-expanded", isExpanded);
-            
-            // Swap hamburger SVG dynamically if needed, or simply toggle class
-            if (isExpanded) {
-                mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-            } else {
-                mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
-            }
+        // Create Backdrop
+        const backdrop = document.createElement("div");
+        backdrop.className = "mobile-drawer-backdrop";
+        backdrop.id = "mobile-drawer-backdrop";
+
+        // Create Side Drawer
+        const drawer = document.createElement("aside");
+        drawer.className = "mobile-drawer";
+        drawer.id = "mobile-drawer";
+        drawer.setAttribute("aria-label", "Mobile Navigation Menu");
+
+        // Determine current active page
+        const currentPath = window.location.pathname.replace(/\/$/, "");
+
+        const navLinksData = [
+            { title: "Home", href: homeHref },
+            { title: "Commercial Van Insurance", href: `${rootPrefix}van-insurance/commercial-van-insurance/` },
+            { title: "Courier Van Insurance", href: `${rootPrefix}commercial-vehicle-insurance/van-insurance/courier-van-insurance/` },
+            { title: "Taxi Insurance Hub", href: `${rootPrefix}commercial-vehicle-insurance/taxi-insurance/` },
+            { title: "Fleet Insurance Hub", href: `${rootPrefix}commercial-vehicle-insurance/fleet-insurance/` },
+            { title: "HGV & Haulage Insurance", href: `${rootPrefix}commercial-vehicle-insurance/hgv-insurance/` },
+            { title: "Guides Hub", href: `${rootPrefix}commercial-vehicle-insurance/` },
+            { title: "Comparison Guides", href: `${rootPrefix}compare/` },
+            { title: "About Us", href: `${rootPrefix}about/` },
+            { title: "Contact Us", href: `${rootPrefix}contact/` }
+        ];
+
+        let navListHtml = "";
+        navLinksData.forEach(item => {
+            const isHome = item.title === "Home" && (window.location.pathname.endsWith("index.html") || window.location.pathname.endsWith("/"));
+            const isActive = isHome || window.location.href.includes(item.href.replace(/^\.\.\//, "").replace(/^\.\//, ""));
+            navListHtml += `
+                <li>
+                    <a href="${item.href}" class="${isActive ? 'active' : ''}">
+                        <span>${item.title}</span>
+                        <span class="drawer-arrow">&rsaquo;</span>
+                    </a>
+                </li>
+            `;
         });
-        
-        // Hide menu on clicking a link on mobile
-        document.querySelectorAll(".nav-link").forEach(link => {
-            link.addEventListener("click", () => {
-                navLinks.classList.remove("show");
-                mobileToggle.setAttribute("aria-expanded", "false");
-                mobileToggle.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
+
+        drawer.innerHTML = `
+            <div class="mobile-drawer-header">
+                <a href="${homeHref}" class="logo logo-branded" style="text-decoration: none;">
+                    <span class="logo-text"><span class="logo-ins">Insurance</span><span class="logo-care">Care</span></span>
+                </a>
+                <button class="mobile-drawer-close" id="mobile-drawer-close-btn" aria-label="Close navigation menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="mobile-drawer-contact">
+                <div>
+                    <span class="contact-label">Freephone UK</span>
+                    <a href="tel:08006906008" class="contact-tel">0800 690 6008</a>
+                </div>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+
+            <div class="mobile-drawer-body">
+                <div class="mobile-drawer-section-title">Navigation Menu</div>
+                <ul class="mobile-drawer-nav">
+                    ${navListHtml}
+                </ul>
+            </div>
+
+            <div class="mobile-drawer-footer">
+                <a href="${rootPrefix}get-matched/" class="btn-drawer-cta">Get Matched Now &rarr;</a>
+                <div class="mobile-drawer-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>FCA-Authorised Broker Panel</span>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(backdrop);
+        document.body.appendChild(drawer);
+
+        const openDrawer = () => {
+            backdrop.classList.add("active");
+            drawer.classList.add("active");
+            document.body.classList.add("mobile-nav-locked");
+            document.querySelectorAll(".mobile-nav-toggle, .mobile-nav-toggle-new").forEach(b => b.setAttribute("aria-expanded", "true"));
+        };
+
+        const closeDrawer = () => {
+            backdrop.classList.remove("active");
+            drawer.classList.remove("active");
+            document.body.classList.remove("mobile-nav-locked");
+            document.querySelectorAll(".mobile-nav-toggle, .mobile-nav-toggle-new").forEach(b => b.setAttribute("aria-expanded", "false"));
+        };
+
+        // Attach listeners to all hamburger buttons on the page
+        document.querySelectorAll(".mobile-nav-toggle, .mobile-nav-toggle-new").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                openDrawer();
             });
         });
-    }
+
+        // Close events
+        const closeBtn = document.getElementById("mobile-drawer-close-btn");
+        if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
+        backdrop.addEventListener("click", closeDrawer);
+
+        // Escape key close
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && drawer.classList.contains("active")) {
+                closeDrawer();
+            }
+        });
+
+        // Close when clicking any nav link
+        drawer.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", closeDrawer);
+        });
+    };
+
+    initMobileDrawer();
 
     // 2. Cookie Consent Banner Logic
     const cookieBanner = document.getElementById("cookie-banner");
