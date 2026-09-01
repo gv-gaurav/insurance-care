@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </ul>
                     </div>
 
-                    <a href="/" class="btn btn-secondary">Return to Homepage</a>
+                    <a href="../" class="btn btn-secondary">Return to Homepage</a>
                 </div>
             `;
         }
